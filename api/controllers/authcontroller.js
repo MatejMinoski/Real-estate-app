@@ -50,7 +50,7 @@ try {
   
 } catch (error) {
   next(error)
-  
+   
 }
 }
 export const oath=async(req,res,next)=>{
