@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { signInFailure, signInStart, signInSuccess } from "../redux/user/userStore";
 import OAuth from "../components/OAuth"
 export default function SignIn() {
-  const [formData, setFomData] = React.useState({});
+  const [formData, setFormData] = React.useState({});
  const {loading,error}=useSelector((state)=>state.user)
  const dispatch=useDispatch()
   const navigate = useNavigate();
   const handleChange = (e) => {
-    setFomData({
+    setFormData({
       ...formData,
       [e.target.id]: e.target.value,
     });
@@ -34,7 +34,7 @@ export default function SignIn() {
       });
       const data = await res.json();
      
-      if (data.success == false) {
+      if (data.success === false) {
         dispatch(signInFailure(data.message))
         return;
       }

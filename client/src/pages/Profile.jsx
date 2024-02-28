@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useRef,useState ,useEffect} from 'react';
 import {getDownloadURL, getStorage,ref, uploadBytesResumable} from 'firebase/storage'
-import {updateUserStart,updateUserFailure,updateUserSuccess} from "../redux/user/userStore"
+import {updateUserStart,updateUserFailure,updateUserSuccess,deleteUserFailure,deleteUserStart,deleteUserSuccess,signOutFailure,signOutStart,signOutSuccess} from "../redux/user/userStore"
 import { useDispatch } from 'react-redux';
 import { app } from '../firebase';
 export default function Profile() {
@@ -14,11 +14,8 @@ export default function Profile() {
   const [formData, setFormData] = useState({});
   const [updateSucces,setUpdateSuccess]=useState(false)
   const dispatch = useDispatch();
-  console.log(formData);
-  console.log(filePerc);
-  console.log(errors);
-   // Corrected typo
 
+ 
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -76,9 +73,43 @@ export default function Profile() {
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true)
     } catch (error) {
-      dispatch(updateUserFailure(errors.message));
+      dispatch(updateUserFailure(error.message));
     }
   };
+ const handleDeleteUser = async () => {
+   try {
+     dispatch(deleteUserStart());
+     const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+       method: "DELETE",
+     });
+     const data = await res.json();
+     if (data.success === false) {
+       dispatch(deleteUserFailure(data.message));
+       return;
+     }
+     dispatch(deleteUserSuccess(data));
+   } catch (error) {
+     dispatch(deleteUserFailure(error.message));
+   }
+ };
+ const handleSignOut=async()=>{
+  
+  try {
+   
+    dispatch(signOutStart());
+    const res=await fetch('/api/auth/signout')
+    const data=await res.json()
+    if(data.success===false){
+       dispatch(signOutFailure(data.message))
+       return;
+    }
+    dispatch(signOutSuccess(data.message))
+  } catch (error) {
+    dispatch(signOutFailure(data.message))
+    
+  }
+ }
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -140,11 +171,20 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-500 cursor-pointer">Delete</span>
-        <span className="text-red-500 cursor-pointer">Sign Out</span>
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete account
+        </span>
+        <span className="text-red-500 cursor-pointer" onClick={handleSignOut}>
+          Sign Out
+        </span>
       </div>
       <p className="text-red-500 mt-5">{error ? error : ""}</p>
-      <p className="text-green-500 mt-5">{updateSucces? "User is updated sucessfully" : ""}</p>
+      <p className="text-green-500 mt-5">
+        {updateSucces ? "User is updated sucessfully" : ""}
+      </p>
     </div>
   );
 }
