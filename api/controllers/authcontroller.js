@@ -4,7 +4,7 @@ import { errorHandler } from "../utils/error.js";
 import  jwt  from "jsonwebtoken";
 export const auth = async (req, res,next) => {
  const {username,email,password}=req.body
- const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+ const existingUser = await User.findOne( {$or: [{ email }, { username }]} );
 
  if (existingUser) {
    // User already registered, return an error
